@@ -143,3 +143,48 @@ function addListeners() {
 }
 
 addListeners();
+
+const commentsContainer = document.getElementById("commentsContainer");
+const commentsList = document.getElementById("commentsList");
+const commentsLoader = document.getElementById("commentsLoader");
+
+let commentsData = [];
+let commentsPage = 1;
+const commentsLimit = 10;
+
+// Функція для завантаження коментарів
+function loadComments() {
+  commentsLoader.classList.remove("hidden");
+
+  fetch(`https://jsonplaceholder.typicode.com/comments?_page=${commentsPage}&_limit=${commentsLimit}`)
+      .then((response) => response.json())
+      .then((json) => {
+        commentsData = json;
+        displayComments();
+        commentsPage++;
+        commentsLoader.classList.add("hidden");
+      });
+}
+
+// Функція для відображення коментарів
+function displayComments() {
+  commentsData.forEach((comment) => {
+    const liEl = document.createElement("li");
+    liEl.classList.value = "px-4 py-2 border-b";
+    liEl.innerHTML = `<span class="font-bold">${comment.name}:</span> ${comment.body}`;
+    commentsList.appendChild(liEl);
+  });
+}
+
+// Додаємо слухач подій на скрол контейнеру коментарів
+commentsContainer.addEventListener("scroll", function () {
+  const { scrollTop, scrollHeight, clientHeight } = commentsContainer;
+
+  // Якщо доскролили до кінця контейнера
+  if (scrollTop + clientHeight >= scrollHeight - 5) {
+    loadComments();
+  }
+});
+
+// Завантаження початкових коментарів
+loadComments();
